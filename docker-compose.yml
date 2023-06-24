@@ -1,0 +1,24 @@
+version: '3.7'
+services:
+  db:
+    image: mysql:latest
+    volumes:
+      - /var/lib/mysql:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: P@ssw0rd
+    networks:
+      - localnetwork
+
+  web:
+    build:
+      context: ./web
+      dockerfile: Dockerfile
+    ports:
+      - "8080:80"
+    networks:
+      - localnetwork
+    depends_on:
+      - db
+
+networks:
+  localnetwork:
