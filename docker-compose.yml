@@ -1,11 +1,11 @@
 version: '3.7'
 services:
   db:
-    image: mysql:latest
+    image: mysql:8.0
     volumes:
-      - /var/lib/mysql:/var/lib/mysql
+      - ${DATABASE_DIR}:/var/lib/mysql
     environment:
-      MYSQL_ROOT_PASSWORD: P@ssw0rd
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
     networks:
       - localnetwork
 
