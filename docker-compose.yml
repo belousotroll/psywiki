@@ -1,22 +1,40 @@
 version: '3.7'
 services:
   db:
-    image: mysql:8.0
+    build:
+      context: ./database
+      dockerfile: Dockerfile
     volumes:
       - ${DATABASE_DIR}:/var/lib/mysql
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${WIKI_DATABASE}
+      MYSQL_USER: ${WIKI_USER}
+      MYSQL_PASSWORD: ${WIKI_PASSWORD}
+    env_file:
+      - '.env'
     networks:
       - localnetwork
+    ports:
+      - "3306:3306"
 
   web:
     build:
       context: ./web
       dockerfile: Dockerfile
-    ports:
-      - "8080:80"
+    environment:
+      WIKI_DATABASE: ${WIKI_DATABASE}
+      WIKI_USER: ${WIKI_USER}
+      WIKI_PASSWORD: ${WIKI_PASSWORD}
+      WIKI_ADMIN_USER: ${WIKI_ADMIN_USER}
+      WIKI_ADMIN_PASSWORD: ${WIKI_ADMIN_PASSWORD}
+      WIKI_SITE_NAME: ${WIKI_SITE_NAME}
+    env_file:
+      - '.env'
     networks:
       - localnetwork
+    ports:
+      - "8080:80"
     depends_on:
       - db
 
