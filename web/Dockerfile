@@ -13,7 +13,8 @@ RUN (apt-get update && apt-get install -y \
     php-mbstring \
     php-mysql \
     php-xml \
-    apache2)
+    apache2  \
+    && rm -rf /var/lib/apt/lists/*)
 
 # Очистить директорию перед установкой
 RUN (mkdir -p /var/www/html/ && \
@@ -25,16 +26,9 @@ RUN (wget https://releases.wikimedia.org/mediawiki/1.39/mediawiki-1.39.3.tar.gz 
     mv mediawiki-1.39.3/* /var/www/html/ && \
     rm -rf mediawiki-1.39.3.tar.gz)
 
-#Run MediaWiki setup script (This step will likely need more adjustment, including non-interactive setup or Docker secrets for secure handling of passwords)
-RUN (php /var/www/html/maintenance/install.php \
-    --dbname ${WIKI_DATABASE}  \
-    --dbuser ${WIKI_USER}  \
-    --dbpass ${WIKI_PASSWORD}  \
-    --pass ${WIKI_ADMIN_PASSWORD}  \
-    --server http://db:3306  \
-    --scriptpath /var/www/html/maintenance  \
-    ${WIKI_SITE_NAME}  \
-    ${WIKI_ADMIN_USER})
+# Add setup script
+COPY setup.sh /setup.sh
+RUN chmod +x /setup.sh
 
 # Start Apache server in the foreground
-CMD apachectl -D FOREGROUND
+ENTRYPOINT ["/setup.sh"]
